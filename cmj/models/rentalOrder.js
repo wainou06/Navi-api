@@ -1,0 +1,26 @@
+const Sequelize = require('sequelize')
+
+module.exports = class RentalOrder extends Sequelize.Model {
+   static init(sequelize) {
+      return super.init(
+         {
+            orderStatus: {
+               type: Sequelize.STRING(255),
+               allowNull: false,
+            },
+         },
+         {
+            sequelize,
+            timestamps: true,
+            underscored: false,
+            modelName: 'RentalOrder',
+            tableName: 'RentalOrders',
+            paranoid: true,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_general_ci',
+         }
+      )
+   }
+
+   static associate(db) {}
+}

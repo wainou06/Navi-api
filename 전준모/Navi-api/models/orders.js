@@ -22,5 +22,7 @@ module.exports = class Orders extends Sequelize.Model {
       )
    }
 
-   static associate(db) {}
+   static associate(db) {
+      Orders.belongsTo(db.User, { foreignKey: 'userId', targetKey: 'id', onDelete: 'CASCADE' })
+   }
 }

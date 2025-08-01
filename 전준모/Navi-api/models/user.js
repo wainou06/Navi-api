@@ -49,5 +49,8 @@ module.exports = class User extends Sequelize.Model {
       )
    }
 
-   static associate(db) {}
+   static associate(db) {
+      User.hasMany(db.Order, { foreignKey: 'userId', sourceKey: 'id', onDelete: 'CASCADE' })
+      User.hasMany(db.RentalOrder, { foreignKey: 'userId', sourceKey: 'id', onDelete: 'CASCADE' })
+   }
 }

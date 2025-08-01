@@ -5,7 +5,7 @@ module.exports = class Item extends Sequelize.Model {
       return super.init(
          {
             price: {
-               type: Sequelize.NUMBER,
+               type: Sequelize.INTEGER,
                allowNull: false,
             },
             itemSellStatus: {
@@ -30,5 +30,9 @@ module.exports = class Item extends Sequelize.Model {
       )
    }
 
-   static associate(db) {}
+   static associate(db) {
+      // Item.hasMany(db.Img, { foreignKey: 'itemId', sourceKey: 'id' })
+      // Item.hasMany(db.ItemKeyword, { foreignKey: 'itemId', sourceKey: 'id' })
+      // Item.belongsTo(db.Order, { foreignKey: 'orderId', sourceKey: 'id' })
+   }
 }

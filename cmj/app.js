@@ -70,5 +70,5 @@ app.use((err, req, res, next) => {
 })
 
 app.listen(app.get('port'), () => {
-   console.log(`서버가 작동 중 입니다. http://localhost:${PORT}`)
+   console.log(`서버가 작동 중 입니다. http://localhost:${app.get('port')}`)
 })

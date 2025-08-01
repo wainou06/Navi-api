@@ -5,7 +5,7 @@ module.exports = class Rating extends Sequelize.Model {
       return super.init(
          {
             rating: {
-               type: Sequelize.NUMBER,
+               type: Sequelize.INTEGER,
                allowNull: false,
             },
             comment: {

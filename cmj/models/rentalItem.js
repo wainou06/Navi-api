@@ -5,7 +5,7 @@ module.exports = class RentalItem extends Sequelize.Model {
       return super.init(
          {
             oneDayPrice: {
-               type: Sequelize.NUMBER,
+               type: Sequelize.INTEGER,
                allowNull: false,
             },
             rentalStatus: {

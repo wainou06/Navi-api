@@ -11,7 +11,7 @@ const RentalImg = require('./rentalImg.js')
 const RentalItem = require('./rentalItem')
 const RentalOrder = require('./rentalOrder')
 const Statistic = require('./statistic.js')
-const User = require('./user')
+const User = require('./user.js')
 
 const db = {}
 const sequelize = new Sequelize(config.database, config.username, config.password, config)
@@ -48,6 +48,6 @@ RentalImg.associate(db)
 RentalItem.associate(db)
 RentalOrder.associate(db)
 Statistic.associate(db)
-User.associations(db)
+User.associate(db)
 
 module.exports = db

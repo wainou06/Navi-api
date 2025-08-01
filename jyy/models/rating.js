@@ -62,20 +62,22 @@ module.exports = class Rating extends Sequelize.Model {
 
    static associate(db) {
       // Rating -> User (N:1)
-      db.Rating.belongsTo(db.User, {
-         foreignKey: 'userId',
+      Rating.belongsTo(db.User, {
+         foreignKey: 'fromUserId',
          targetKey: 'id',
-         as: 'user',
       })
-
-      // Rating -> Order (N:1) - nullable
+      Rating.belongsTo(db.User, {
+         foreignKey: 'toUserId',
+         targetKey: 'id',
+      })
+      // Rating -> Order (N:1)
       db.Rating.belongsTo(db.Order, {
          foreignKey: 'orderId',
          targetKey: 'id',
          as: 'order',
       })
 
-      // Rating -> RentalOrder (N:1) - nullable
+      // Rating -> RentalOrder (N:1)
       db.Rating.belongsTo(db.RentalOrder, {
          foreignKey: 'rentalOrderId',
          targetKey: 'id',

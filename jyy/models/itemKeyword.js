@@ -4,23 +4,13 @@ module.exports = class ItemKeyword extends Sequelize.Model {
    static init(sequelize) {
       return super.init(
          {
-            itemId: {
-               type: Sequelize.INTEGER,
+            startAt: {
+               type: Sequelize.DATE,
                allowNull: false,
-               references: {
-                  model: 'Items',
-                  key: 'id',
-                  onUpdate: 'CASCADE',
-                  onDelete: 'CASCADE',
-               },
             },
-            keywordId: {
-               type: Sequelize.INTEGER,
+            endAt: {
+               type: Sequelize.DATE,
                allowNull: false,
-               references: {
-                  model: 'Keywords',
-                  key: 'id',
-               },
             },
          },
          {
@@ -36,5 +26,18 @@ module.exports = class ItemKeyword extends Sequelize.Model {
       )
    }
 
-   static associate(db) {}
+   static associate(db) {
+      ItemKeyword.belongsTo(db.Item, {
+         foreignKey: 'itemId',
+         targetKey: 'id',
+      })
+      ItemKeyword.belongsTo(db.RentalItem, {
+         foreignKey: 'rentalItemId',
+         targetKey: 'id',
+      })
+      ItemKeyword.belongsTo(db.Keyword, {
+         foreignKey: 'keywordId',
+         targetKey: 'id',
+      })
+   }
 }

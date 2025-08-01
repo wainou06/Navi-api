@@ -8,6 +8,19 @@ module.exports = class RentalOrder extends Sequelize.Model {
                type: Sequelize.STRING(255),
                allowNull: false,
             },
+            quantity: {
+               type: Sequelize.INTEGER,
+               allowNull: false,
+            },
+            useStart: {
+               type: Sequelize.DATE,
+               allowNull: false,
+            },
+            useEnd: {
+               type: Sequelize.DATE,
+               allowNull: false,
+            },
+
             userId: {
                type: Sequelize.INTEGER,
                allowNull: false,
@@ -40,13 +53,15 @@ module.exports = class RentalOrder extends Sequelize.Model {
          as: 'user',
       })
 
-      // RentalOrder -> RentalItem (1:N)
-      db.RentalOrder.hasMany(db.RentalItem, {
+      // RentalOrder <-> RentalItem
+      db.RentalOrder.belongsToMany(db.RentalItem, {
+         through: db.RentalOrderItem,
          foreignKey: 'rentalOrderId',
-         sourceKey: 'id',
+         otherKey: 'rentalItemId',
          as: 'rentalItems',
       })
-      db.RentalOrder.hasMany(db.Rating, {
+
+      db.RentalOrder.hasOne(db.Rating, {
          foreignKey: 'rentalOrderId',
          sourceKey: 'id',
          as: 'ratings',

@@ -23,12 +23,9 @@ module.exports = class Keyword extends Sequelize.Model {
    }
 
    static associate(db) {
-      // Keyword <-> Item (N:M)
-      db.Keyword.belongsToMany(db.Item, {
-         through: 'ItemKeywords',
+      Keyword.hasMany(db.ItemKeyword, {
          foreignKey: 'keywordId',
-         otherKey: 'itemId',
-         as: 'items',
+         sourceKey: 'id',
       })
    }
 }

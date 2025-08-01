@@ -10,9 +10,9 @@ const Rating = require('./rating')
 const RentalImg = require('./rentalImg.js')
 const RentalItem = require('./rentalItem')
 const RentalOrder = require('./rentalOrder')
-// const Statistic = require('./statistic.js')
 const User = require('./user.js')
 const ItemKeyword = require('./itemKeyword.js')
+const RentalOrderItem = require('./rentalOrderItem.js')
 
 const db = {}
 const sequelize = new Sequelize(config.database, config.username, config.password, config)
@@ -27,9 +27,9 @@ db.Rating = Rating
 db.RentalImg = RentalImg
 db.RentalItem = RentalItem
 db.RentalOrder = RentalOrder
-// db.Statistic = Statistic
 db.User = User
 db.ItemKeyword = ItemKeyword
+db.RentalOrderItem = RentalOrderItem
 
 Img.init(sequelize)
 Item.init(sequelize)
@@ -39,9 +39,9 @@ Rating.init(sequelize)
 RentalImg.init(sequelize)
 RentalItem.init(sequelize)
 RentalOrder.init(sequelize)
-// Statistic.init(sequelize)
 User.init(sequelize)
 ItemKeyword.init(sequelize)
+RentalOrderItem.init(sequelize)
 
 Img.associate(db)
 Item.associate(db)
@@ -51,8 +51,8 @@ Rating.associate(db)
 RentalImg.associate(db)
 RentalItem.associate(db)
 RentalOrder.associate(db)
-// Statistic.associate(db)
 User.associate(db)
 ItemKeyword.associate(db)
+RentalOrderItem.associate(db)
 
 module.exports = db

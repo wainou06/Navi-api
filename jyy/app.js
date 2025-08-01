@@ -7,12 +7,16 @@ const passport = require('passport')
 const path = require('path')
 require('dotenv').config()
 
+//라우터 및 기타 모듈 불러오기
 const indexRouter = require('./routes')
 const { sequelize } = require('./models')
+const itemsRouter = require('./routes/items')
+const rentalItemsRouter = require('./routes/rentalItems')
 
 const app = express()
 const PORT = process.env.PORT || 3000
 
+// 시퀄라이즈를 사용한 DB연결
 sequelize
    .sync({ force: false, alter: true })
    .then(() => {
@@ -29,6 +33,7 @@ app.use(
       credentials: true,
    })
 )
+
 app.use(morgan('dev'))
 app.use(express.static(path.join(__dirname, 'uploads')))
 app.use(express.json())
@@ -49,7 +54,10 @@ app.use(
 app.use(passport.initialize())
 app.use(passport.session())
 
+//라우터 등록
 app.use('/', indexRouter)
+app.use('/items', itemsRouter)
+app.use('/rental-items', rentalItemsRouter)
 
 app.use((req, res, next) => {
    const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`)

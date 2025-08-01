@@ -57,12 +57,10 @@ module.exports = class Item extends Sequelize.Model {
          as: 'imgs',
       })
 
-      // Item <-> Keyword (N:M)
-      db.Item.belongsToMany(db.Keyword, {
-         through: 'ItemKeywords',
+      // Item <-> Keyword (1:n)
+      db.Item.hasMany(db.ItemKeyword, {
          foreignKey: 'itemId',
          otherKey: 'keywordId',
-         as: 'keywords',
       })
    }
 }

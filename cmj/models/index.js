@@ -2,9 +2,52 @@ const Sequelize = require('sequelize')
 const env = 'development'
 const config = require('../config/config.json')[env]
 
+const Img = require('./img')
+const Item = require('./item')
+const Keyword = require('./keyword')
+const Order = require('./order')
+const Rating = require('./rating')
+const RentalImg = require('./rentalImg.js')
+const RentalItem = require('./rentalItem')
+const RentalOrder = require('./rentalOrder')
+const Statistic = require('./statistic.js')
+const User = require('./user')
+
 const db = {}
 const sequelize = new Sequelize(config.database, config.username, config.password, config)
 
 db.sequelize = sequelize
+db.Img = Img
+db.Item = Item
+db.Keyword = Keyword
+db.Order = Order
+db.Rating = Rating
+db.RentalImg = RentalImg
+db.RentalItem = RentalItem
+db.RentalOrder = RentalOrder
+db.Statistic = Statistic
+db.User = User
+
+Img.init(sequelize)
+Item.init(sequelize)
+Keyword.init(sequelize)
+Order.init(sequelize)
+Rating.init(sequelize)
+RentalImg.init(sequelize)
+RentalItem.init(sequelize)
+RentalOrder.init(sequelize)
+Statistic.init(sequelize)
+User.init(sequelize)
+
+Img.associate(db)
+Item.associate(db)
+Keyword.associate(db)
+Order.associate(db)
+Rating.associate(db)
+RentalImg.associate(db)
+RentalItem.associate(db)
+RentalOrder.associate(db)
+Statistic.associate(db)
+User.associations(db)
 
 module.exports = db

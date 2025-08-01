@@ -4,6 +4,14 @@ module.exports = class RentalItem extends Sequelize.Model {
    static init(sequelize) {
       return super.init(
          {
+            rentalItemNm: {
+               type: Sequelize.STRING(255),
+               allowNull: false,
+            },
+            quantity: {
+               type: Sequelize.INTEGER,
+               allowNull: false,
+            },
             oneDayPrice: {
                type: Sequelize.INTEGER,
                allowNull: false,
@@ -39,9 +47,9 @@ module.exports = class RentalItem extends Sequelize.Model {
          foreignKey: 'rentalItemId',
          sourceKey: 'id',
       })
-      RentalItem.belongsTo(db.RentalOrder, {
-         foreignKey: 'rentalOrderId',
-         targetKey: 'id',
+      RentalItem.hasMany(db.RentalOrderItem, {
+         foreignKey: 'rentalItemId',
+         sourceKey: 'id',
       })
    }
 }

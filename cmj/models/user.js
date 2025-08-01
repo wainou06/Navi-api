@@ -64,9 +64,5 @@ module.exports = class User extends Sequelize.Model {
          foreignKey: 'toUserId',
          sourceKey: 'id',
       })
-      User.belongsTo(db.Statistic, {
-         foreignKey: 'statisticId',
-         targetKey: 'id',
-      })
    }
 }

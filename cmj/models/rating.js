@@ -43,9 +43,5 @@ module.exports = class Rating extends Sequelize.Model {
          foreignKey: 'rentalOrderId',
          targetKey: 'id',
       })
-      Rating.belongsTo(db.Statistic, {
-         foreignKey: 'statisticId',
-         targetKey: 'id',
-      })
    }
 }

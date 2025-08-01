@@ -20,15 +20,9 @@ module.exports = class RentalItem extends Sequelize.Model {
                type: Sequelize.TEXT,
                allowNull: false,
             },
-            rentalOrderId: {
+            quantity: {
                type: Sequelize.INTEGER,
                allowNull: false,
-               references: {
-                  model: 'RentalOrders',
-                  key: 'id',
-                  onUpdate: 'CASCADE',
-                  onDelete: 'CASCADE',
-               },
             },
          },
          {
@@ -45,11 +39,12 @@ module.exports = class RentalItem extends Sequelize.Model {
    }
 
    static associate(db) {
-      // RentalItem -> RentalOrder (N:1)
-      db.RentalItem.belongsTo(db.RentalOrder, {
-         foreignKey: 'rentalOrderId',
-         targetKey: 'id',
-         as: 'rentalOrder',
+      // RentalItem <-> RentalOrder
+      db.RentalItem.belongsToMany(db.RentalOrder, {
+         through: db.RentalOrderItem,
+         foreignKey: 'rentalItemId',
+         otherKey: 'rentalOrderId',
+         as: 'rentalOrders',
       })
 
       // RentalItem -> RentalImg (1:N)
@@ -57,6 +52,11 @@ module.exports = class RentalItem extends Sequelize.Model {
          foreignKey: 'rentalItemId',
          sourceKey: 'id',
          as: 'rentalImgs',
+      })
+
+      db.RentalItem.hasMany(db.ItemKeyword, {
+         foreignKey: 'rentalItemId',
+         sourceKey: 'id',
       })
    }
 }

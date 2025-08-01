@@ -44,7 +44,6 @@ module.exports = class Img extends Sequelize.Model {
       db.Img.belongsTo(db.Item, {
          foreignKey: 'itemId',
          targetKey: 'id',
-         as: 'item',
       })
    }
 }

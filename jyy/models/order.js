@@ -39,15 +39,14 @@ module.exports = class Order extends Sequelize.Model {
       })
 
       // Order -> Item (1:N)
-      db.Order.hasMany(db.Item, {
+      db.Order.hasOne(db.Item, {
          foreignKey: 'orderId',
          sourceKey: 'id',
          as: 'items',
       })
-      db.Order.hasMany(db.Rating, {
+      db.Order.hasOne(db.Rating, {
          foreignKey: 'orderId',
          sourceKey: 'id',
-         as: 'ratings',
       })
    }
 }

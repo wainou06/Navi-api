@@ -8,7 +8,7 @@ require('dotenv').config() // 환경 변수 관리
 const cors = require('cors') // cors 미들웨어 -> ★api 서버는 반드시 설정해줘야 한다
 
 const indexRouter = require('./routes')
-const authRouter = require('./routes')
+const authRouter = require('./routes/auth')
 
 const { sequelize } = require('./models')
 const passportConfig = require('./passport')

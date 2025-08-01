@@ -70,7 +70,7 @@ router.post('/login', isNotLoggedIn, async (req, res, next) => {
             loginError.message = '로그인 중 오류 발생'
             return next(loginError)
          }
-
+         784.2
          res.json({
             success: true,
             message: '로그인 성공',
@@ -100,7 +100,7 @@ router.get('/logout', isLoggedIn, async (req, res, next) => {
    })
 })
 
-// 상태확인
+// 상태확인 /status 여기도 있음
 router.get('/status', async (req, res, next) => {
    try {
       if (req.isAuthenticated()) {

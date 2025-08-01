@@ -32,6 +32,7 @@ module.exports = class User extends Sequelize.Model {
             access: {
                type: Sequelize.ENUM('MANAGER', 'USER'),
                allowNull: false,
+               defaultValue: 'USER',
             },
          },
          {

@@ -1,11 +1,15 @@
 const Sequelize = require('sequelize')
 
-module.exports = class Keyword extends Sequelize.Model {
+module.exports = class Rating extends Sequelize.Model {
    static init(sequelize) {
       return super.init(
          {
-            name: {
-               type: Sequelize.STRING(255),
+            rating: {
+               type: Sequelize.NUMBER,
+               allowNull: false,
+            },
+            comment: {
+               type: Sequelize.TEXT,
                allowNull: false,
             },
          },
@@ -13,8 +17,8 @@ module.exports = class Keyword extends Sequelize.Model {
             sequelize,
             timestamps: true,
             underscored: false,
-            modelName: 'Keyword',
-            tableName: 'Keywords',
+            modelName: 'Rating',
+            tableName: 'Ratings',
             paranoid: true,
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',

@@ -1,14 +1,10 @@
 const Sequelize = require('sequelize')
 
-module.exports = class Items extends Sequelize.Model {
+module.exports = class Item extends Sequelize.Model {
    static init(sequelize) {
       return super.init(
          {
             price: {
-               type: Sequelize.NUMBER,
-               allowNull: false,
-            },
-            stockNumber: {
                type: Sequelize.NUMBER,
                allowNull: false,
             },

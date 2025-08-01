@@ -1,11 +1,19 @@
 const Sequelize = require('sequelize')
 
-module.exports = class Keyword extends Sequelize.Model {
+module.exports = class Img extends Sequelize.Model {
    static init(sequelize) {
       return super.init(
          {
-            name: {
+            originName: {
                type: Sequelize.STRING(255),
+               allowNull: false,
+            },
+            imgUrl: {
+               type: Sequelize.STRING(255),
+               allowNull: false,
+            },
+            field: {
+               type: Sequelize.ENUM('Y', 'N'),
                allowNull: false,
             },
          },
@@ -13,8 +21,8 @@ module.exports = class Keyword extends Sequelize.Model {
             sequelize,
             timestamps: true,
             underscored: false,
-            modelName: 'Keyword',
-            tableName: 'Keywords',
+            modelName: 'Img',
+            tableName: 'Imgs',
             paranoid: true,
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',

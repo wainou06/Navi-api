@@ -22,5 +22,18 @@ module.exports = class Order extends Sequelize.Model {
       )
    }
 
-   static associate(db) {}
+   static associate(db) {
+      Order.hasOne(db.Item, {
+         foreignKey: 'orderId',
+         sourceKey: 'id',
+      })
+      Order.hasOne(db.Rating, {
+         foreignKey: 'orderId',
+         sourceKey: 'id',
+      })
+      Order.belongsTo(db.User, {
+         foreignKey: 'userId',
+         targetKey: 'id',
+      })
+   }
 }

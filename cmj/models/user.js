@@ -47,5 +47,26 @@ module.exports = class User extends Sequelize.Model {
          }
       )
    }
-   static associate(db) {}
+   static associate(db) {
+      User.hasMany(db.Order, {
+         foreignKey: 'userId',
+         sourceKey: 'id',
+      })
+      User.hasMany(db.RentalOrder, {
+         foreignKey: 'userId',
+         sourceKey: 'id',
+      })
+      User.hasMany(db.Rating, {
+         foreignKey: 'fromUserId',
+         sourceKey: 'id',
+      })
+      User.hasMany(db.Rating, {
+         foreignKey: 'toUserId',
+         sourceKey: 'id',
+      })
+      User.belongsTo(db.Statistic, {
+         foreignKey: 'statisticId',
+         targetKey: 'id',
+      })
+   }
 }

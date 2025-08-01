@@ -22,5 +22,10 @@ module.exports = class Keyword extends Sequelize.Model {
       )
    }
 
-   static associate(db) {}
+   static associate(db) {
+      Keyword.hasMany(db.ItemKeyword, {
+         foreignKey: 'keywordId',
+         sourceKey: 'id',
+      })
+   }
 }

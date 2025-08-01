@@ -22,5 +22,18 @@ module.exports = class RentalOrder extends Sequelize.Model {
       )
    }
 
-   static associate(db) {}
+   static associate(db) {
+      RentalOrder.hasOne(db.RentalItem, {
+         foreignKey: 'rentalOrderId',
+         sourceKey: 'id',
+      })
+      RentalOrder.hasOne(db.Rating, {
+         foreignKey: 'rentalOrderId',
+         sourceKey: 'id',
+      })
+      RentalOrder.belongsTo(db.User, {
+         foreignKey: 'userId',
+         targetKey: 'id',
+      })
+   }
 }

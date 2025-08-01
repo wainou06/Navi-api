@@ -4,7 +4,7 @@ module.exports = class Statistic extends Sequelize.Model {
    static init(sequelize) {
       return super.init(
          {
-            request: {
+            status: {
                type: Sequelize.STRING(255),
                allowNull: false,
             },
@@ -22,5 +22,10 @@ module.exports = class Statistic extends Sequelize.Model {
       )
    }
 
-   static associate(db) {}
+   static associate(db) {
+      Statistic.hasMany(db.Rating, {
+         foreignKey: 'statisticId',
+         sourceKey: 'id',
+      })
+   }
 }

@@ -4,6 +4,10 @@ module.exports = class Item extends Sequelize.Model {
    static init(sequelize) {
       return super.init(
          {
+            itemNm: {
+               type: Sequelize.STRING(255),
+               allowNull: false,
+            },
             price: {
                type: Sequelize.INTEGER,
                allowNull: false,

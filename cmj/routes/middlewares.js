@@ -20,7 +20,7 @@ exports.isNotLoggedIn = (req, res, next) => {
    }
 }
 
-exports.isAdmin = (req, res, next) => {
+exports.isManager = (req, res, next) => {
    if (req.isAuthenticated()) {
       if (req.user && req.user.access === 'MANAGER') {
          next()

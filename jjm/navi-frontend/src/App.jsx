@@ -7,7 +7,6 @@ import Navbar from './components/shared/Navbar'
 import Home from './pages/Home'
 import SignupPage from './pages/SignupPage'
 import LoginPage from './pages/LoginPage'
-import SearchPwPage from './pages/SearchPwPage'
 
 import { checkAuthStatusThunk } from './features/authSlice'
 
@@ -28,7 +27,6 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/searchPw" element={<SearchPwPage />} />
          </Routes>
       </>
    )

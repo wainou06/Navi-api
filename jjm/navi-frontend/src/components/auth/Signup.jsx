@@ -3,7 +3,9 @@ import { TextField, Button, Container, Typography, CircularProgress } from '@mui
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { registerUserThunk } from '../../features/authSlice'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+
+import '../../styles/login.css'
 
 function Signup() {
    const [email, setEmail] = useState('')
@@ -68,23 +70,14 @@ function Signup() {
    //회원가입이 완료 되었을때 보일 컴포넌트
    if (isSignupComplete) {
       return (
-         <Container maxWidth="sm">
-            <Typography variant="h4" gutterBottom align="center">
-               회원가입이 완료되었습니다!
-            </Typography>
-            <Typography variant="body1" align="center" style={{ marginTop: '20px' }}>
-               로그인 페이지로 이동하거나 다른 작업을 계속 진행할 수 있습니다.
-            </Typography>
-            <Button
-               variant="contained"
-               color="primary"
-               fullWidth
-               style={{ marginTop: '20px' }}
-               onClick={() => navigate('/login')} // 로그인 페이지로 이동
-            >
-               로그인 하러 가기
-            </Button>
-         </Container>
+         <div className="overlay">
+            <div className="popup">
+               <p>환영합니다. 회원가입이 완료되었습니다!</p>
+               <p>
+                  <Link to="/login">로그인 하러 가기</Link>
+               </p>
+            </div>
+         </div>
       )
    }
 

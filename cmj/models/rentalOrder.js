@@ -4,8 +4,20 @@ module.exports = class RentalOrder extends Sequelize.Model {
    static init(sequelize) {
       return super.init(
          {
+            quantity: {
+               type: Sequelize.INTEGER,
+               allowNull: false,
+            },
             orderStatus: {
                type: Sequelize.STRING(255),
+               allowNull: false,
+            },
+            useStart: {
+               type: Sequelize.DATE,
+               allowNull: false,
+            },
+            useEnd: {
+               type: Sequelize.DATE,
                allowNull: false,
             },
          },
@@ -22,5 +34,18 @@ module.exports = class RentalOrder extends Sequelize.Model {
       )
    }
 
-   static associate(db) {}
+   static associate(db) {
+      RentalOrder.hasMany(db.RentalOrderItem, {
+         foreignKey: 'rentalOrderId',
+         sourceKey: 'id',
+      })
+      RentalOrder.hasOne(db.Rating, {
+         foreignKey: 'rentalOrderId',
+         sourceKey: 'id',
+      })
+      RentalOrder.belongsTo(db.User, {
+         foreignKey: 'userId',
+         targetKey: 'id',
+      })
+   }
 }

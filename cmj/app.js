@@ -8,10 +8,11 @@ const path = require('path')
 require('dotenv').config()
 
 const indexRouter = require('./routes')
+const keywordRouter = require('./routes/keyword')
 const { sequelize } = require('./models')
 
 const app = express()
-app.set(['port', process.env.PORT || 8002])
+app.set('port', process.env.PORT || 8002)
 
 sequelize
    .sync({ force: false })
@@ -49,6 +50,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.use('/', indexRouter)
+app.use('/keyword', keywordRouter)
 
 app.use((req, res, next) => {
    const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`)
@@ -70,5 +72,5 @@ app.use((err, req, res, next) => {
 })
 
 app.listen(app.get('port'), () => {
-   console.log(`서버가 작동 중 입니다. http://localhost:${PORT}`)
+   console.log(`서버가 작동 중 입니다. http://localhost:${app.get('port')}`)
 })

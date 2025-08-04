@@ -1,11 +1,19 @@
 const Sequelize = require('sequelize')
 
-module.exports = class Order extends Sequelize.Model {
+module.exports = class RentalImg extends Sequelize.Model {
    static init(sequelize) {
       return super.init(
          {
-            orderStatus: {
+            originName: {
                type: Sequelize.STRING(255),
+               allowNull: false,
+            },
+            imgUrl: {
+               type: Sequelize.STRING(255),
+               allowNull: false,
+            },
+            field: {
+               type: Sequelize.ENUM('Y', 'N'),
                allowNull: false,
             },
          },
@@ -13,8 +21,8 @@ module.exports = class Order extends Sequelize.Model {
             sequelize,
             timestamps: true,
             underscored: false,
-            modelName: 'Order',
-            tableName: 'Orders',
+            modelName: 'RentalImg',
+            tableName: 'RentalImgs',
             paranoid: true,
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
@@ -23,16 +31,8 @@ module.exports = class Order extends Sequelize.Model {
    }
 
    static associate(db) {
-      Order.hasOne(db.Item, {
-         foreignKey: 'orderId',
-         sourceKey: 'id',
-      })
-      Order.hasOne(db.Rating, {
-         foreignKey: 'orderId',
-         sourceKey: 'id',
-      })
-      Order.belongsTo(db.User, {
-         foreignKey: 'userId',
+      RentalImg.belongsTo(db.RentalItem, {
+         foreignKey: 'rentalItemId',
          targetKey: 'id',
       })
    }

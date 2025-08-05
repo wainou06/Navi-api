@@ -1,11 +1,15 @@
 const express = require('express')
-const path = require('path') // 경로 처리 유틸리티
-const cookieParser = require('cookie-parser') // 쿠키 처리 미들웨어
-const morgan = require('morgan') // HTTP 요청 로깅 미들웨어
-const session = require('express-session') // 세션 관리 미들웨어
-const passport = require('passport') // 인증 미들웨어
-require('dotenv').config() // 환경 변수 관리
-const cors = require('cors') // cors 미들웨어 -> ★api 서버는 반드시 설정해줘야 한다
+const path = require('path')
+const cookieParser = require('cookie-parser')
+const morgan = require('morgan')
+const session = require('express-session')
+const passport = require('passport')
+require('dotenv').config()
+const cors = require('cors')
+
+// 구글 관련 추가 ↓
+require('./server/passport')
+require('./passport')
 
 // swagger 추가
 const { swaggerUi, swaggerSpec } = require('./swagger')
@@ -51,19 +55,8 @@ const sessionMiddleware = session({
 })
 app.use(sessionMiddleware)
 
-// app.use('/auth', authRoutes) // 👈 꼭 필요!
-
 // swagger 추가
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
-
-// 구글 app.use 추가
-// app.use(
-//    session({
-//       secret: 'your_secret',
-//       resave: false,
-//       saveUninitialized: false,
-//    })
-// )
 
 app.use(passport.initialize())
 app.use(passport.session())

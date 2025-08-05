@@ -1,28 +1,20 @@
-import AppBar from '@mui/material/AppBar'
+import SearchIcon from '@mui/icons-material/Search'
 import Box from '@mui/material/Box'
-import Toolbar from '@mui/material/Toolbar'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import Menu from '@mui/material/Menu'
-import MenuIcon from '@mui/icons-material/Menu'
-import Container from '@mui/material/Container'
 import Avatar from '@mui/material/Avatar'
-import Button from '@mui/material/Button'
 import Tooltip from '@mui/material/Tooltip'
 import MenuItem from '@mui/material/MenuItem'
-// import { Link as MUILink } from '@mui/material'
-import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket'
-// https://mui.com/material-ui/react-app-bar/#app-bar-with-responsive-menu
 
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { logoutUserThunk } from '../../features/authSlice'
 
-function Navbar({ isAuthenticated, user }) {
+function Navbar({ isAuthenticated, user, onSearch }) {
    const dispatch = useDispatch()
    const navigate = useNavigate()
-   const [anchorElNav, setAnchorElNav] = useState(null)
    const [anchorElUser, setAnchorElUser] = useState(null)
 
    const handleLogout = () => {
@@ -36,194 +28,122 @@ function Navbar({ isAuthenticated, user }) {
          })
    }
 
-   const handleOpenNavMenu = (event) => {
-      setAnchorElNav(event.currentTarget)
-   }
    const handleOpenUserMenu = (event) => {
       setAnchorElUser(event.currentTarget)
-   }
-
-   const handleCloseNavMenu = () => {
-      setAnchorElNav(null)
    }
 
    const handleCloseUserMenu = () => {
       setAnchorElUser(null)
    }
 
-   console.log(user)
+   const [searchTerm, setSearchTerm] = useState('') // 검색어
+
+   const handleInputChange = (e) => {
+      setSearchTerm(e.target.value)
+   }
+
+   // 검색 버튼 눌렀을때
+   const handleSearch = (e) => {
+      e.preventDefault()
+
+      if (onSearch && searchTerm.trim()) {
+         onSearch(searchTerm.trim())
+      }
+   }
 
    return (
-      <AppBar position="fixed" sx={{ backgroundColor: '#fff', color: '#000' }}>
-         <Container maxWidth="xl">
-            <Toolbar disableGutters>
-               {/* 모바일 메뉴 */}
-               <ShoppingBasketIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
-               <Typography
-                  variant="h6"
-                  noWrap
-                  component="a"
-                  href="/"
-                  sx={{
-                     mr: 2,
-                     display: { xs: 'none', md: 'flex' },
-                     fontFamily: 'monospace',
-                     fontWeight: 700,
-                     letterSpacing: '.3rem',
-                     color: 'inherit',
-                     textDecoration: 'none',
-                  }}
-               >
-                  SHOPMAX
-               </Typography>
-               <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-                  <IconButton size="large" aria-label="account of current user" aria-controls="menu-appbar" aria-haspopup="true" onClick={handleOpenNavMenu} color="inherit">
-                     <MenuIcon />
-                  </IconButton>
-                  <Menu
-                     id="menu-appbar"
-                     anchorEl={anchorElNav}
-                     anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'left',
-                     }}
-                     keepMounted
-                     transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'left',
-                     }}
-                     open={Boolean(anchorElNav)}
-                     onClose={handleCloseNavMenu}
-                     sx={{ display: { xs: 'block', md: 'none' } }}
-                  >
-                     {user && user.role === 'ADMIN' && (
-                        <>
-                           <MenuItem>
-                              <Link to="/items/createlist" style={{ color: 'black', textDecoration: 'none' }}>
-                                 <Typography sx={{ textAlign: 'center' }}>상품등록</Typography>
-                              </Link>
-                           </MenuItem>
-                           <MenuItem>
-                              <Link to="/chart" style={{ color: 'black', textDecoration: 'none' }}>
-                                 <Typography sx={{ textAlign: 'center' }}>통계</Typography>
-                              </Link>
-                           </MenuItem>
-                        </>
+      <header>
+         <div className="shadow">
+            <nav>
+               <Link to="/" className="logo">
+                  <img src="/images/logo.png" alt="로고" height="69" />
+               </Link>
+               <form className="search" onSubmit={handleSearch}>
+                  <input type="text" placeholder="어떤 물건을 찾고 계신가요? 검색해주세요." value={searchTerm} onChange={handleInputChange} />
+                  <button type="submit">
+                     <SearchIcon style={{ fontSize: '30px' }} />
+                  </button>
+               </form>
+               <ul className="nav_menu">
+                  <li>
+                     <img src="/images/고객센터.png" alt="고객센터" height="50" />
+                     <span>고객센터</span>
+                  </li>
+                  <li>
+                     {isAuthenticated ? (
+                        <Link to="/items/create">
+                           <img src="/images/글쓰기.png" alt="상품등록" height="50" />
+                           <span>상품등록</span>
+                        </Link>
+                     ) : (
+                        <Link to="/signup">
+                           <img src="/images/회원가입.png" alt="회원가입하세요" height="50" />
+                           <span>회원가입</span>
+                        </Link>
                      )}
-                     <MenuItem>
-                        <Typography sx={{ textAlign: 'center' }}>상품구매</Typography>
-                     </MenuItem>
-                     <MenuItem>
-                        <Typography sx={{ textAlign: 'center' }}>고객문의</Typography>
-                     </MenuItem>
-                  </Menu>
-               </Box>
-
-               {/* PC 메뉴 */}
-               <ShoppingBasketIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-               <Typography
-                  variant="h5"
-                  noWrap
-                  component="a"
-                  href="/"
-                  sx={{
-                     mr: 2,
-                     display: { xs: 'flex', md: 'none' },
-                     flexGrow: 1,
-                     fontFamily: 'monospace',
-                     fontWeight: 700,
-                     letterSpacing: '.3rem',
-                     color: 'inherit',
-                     textDecoration: 'none',
-                  }}
-               >
-                  SHOPMAX
-               </Typography>
-               <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                  {/* 관리자만 볼 수 있도록 */}
-                  {user && user.role === 'ADMIN' && (
-                     <>
-                        <MenuItem>
-                           <Link to="/items/createlist" style={{ color: 'black', textDecoration: 'none' }}>
-                              <Typography sx={{ textAlign: 'center' }}>상품등록</Typography>
-                           </Link>
-                        </MenuItem>
-                        <MenuItem>
-                           <Link to="/chart" style={{ color: 'black', textDecoration: 'none' }}>
-                              <Typography sx={{ textAlign: 'center' }}>통계</Typography>
-                           </Link>
-                        </MenuItem>
-                     </>
-                  )}
-                  <MenuItem>
-                     <Typography sx={{ textAlign: 'center' }}>상품구매</Typography>
-                  </MenuItem>
-                  <MenuItem>
-                     <Typography sx={{ textAlign: 'center' }}>고객문의</Typography>
-                  </MenuItem>
-               </Box>
-
-               {/* 내 프로필 */}
-               {isAuthenticated ? (
-                  <Box sx={{ flexGrow: 0 }}>
-                     <Typography variant="span" style={{ marginRight: '20px', color: '#000', fontSize: 14 }}>
-                        {/* ?(optional chaining): 값이 undefined 이거나 null일때 에러를 반환하지 않고 그냥 undefined를 반환 */}
-                        {user?.name} 님
-                     </Typography>
-                     <Tooltip title="Open settings">
-                        <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                           <Avatar alt={user?.name} src="/person.png" />
-                        </IconButton>
-                     </Tooltip>
-                     <Menu
-                        sx={{ mt: '45px' }}
-                        id="menu-appbar"
-                        anchorEl={anchorElUser}
-                        anchorOrigin={{
-                           vertical: 'top',
-                           horizontal: 'right',
-                        }}
-                        keepMounted
-                        transformOrigin={{
-                           vertical: 'top',
-                           horizontal: 'right',
-                        }}
-                        open={Boolean(anchorElUser)}
-                        onClose={handleCloseUserMenu}
-                     >
-                        <MenuItem>
-                           <Link to="/myorderlist" style={{ color: 'black', textDecoration: 'none' }}>
-                              <Typography sx={{ textAlign: 'center' }}>주문내역</Typography>
-                           </Link>
-                        </MenuItem>
-                        <MenuItem>
-                           <Typography sx={{ textAlign: 'center' }}>장바구니</Typography>
-                        </MenuItem>
-                        <MenuItem onClick={handleLogout}>
-                           <Typography sx={{ textAlign: 'center' }}>로그아웃</Typography>
-                        </MenuItem>
-                        <MenuItem>
-                           <Link to="/chat" style={{ color: 'black', textDecoration: 'none' }}>
-                              <Typography sx={{ textAlign: 'center' }}>1:1 채팅 문의</Typography>
-                           </Link>
-                        </MenuItem>
-                        {user && user.role === 'ADMIN' && (
-                           <MenuItem>
-                              <Link to="/token" style={{ color: 'black', textDecoration: 'none' }}>
-                                 <Typography sx={{ textAlign: 'center' }}>토큰 발급</Typography>
-                              </Link>
-                           </MenuItem>
-                        )}
-                     </Menu>
-                  </Box>
-               ) : (
-                  <Link to="/login">
-                     <Button variant="contained">로그인</Button>
-                  </Link>
-               )}
-            </Toolbar>
-         </Container>
-      </AppBar>
+                  </li>
+                  <li>
+                     {isAuthenticated ? (
+                        <Box sx={{ flexGrow: 0 }}>
+                           <Tooltip title="Open settings">
+                              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                 <Avatar alt={user?.name} src="/images/로그인상태.png" />
+                                 <Typography variant="span" style={{ marginRight: '20px', color: '#000', fontSize: 14 }}>
+                                    {user?.name} 님
+                                 </Typography>
+                              </IconButton>
+                           </Tooltip>
+                           <Menu
+                              sx={{ mt: '45px' }}
+                              id="menu-appbar"
+                              anchorEl={anchorElUser}
+                              anchorOrigin={{
+                                 vertical: 'top',
+                                 horizontal: 'right',
+                              }}
+                              keepMounted
+                              transformOrigin={{
+                                 vertical: 'top',
+                                 horizontal: 'right',
+                              }}
+                              open={Boolean(anchorElUser)}
+                              onClose={handleCloseUserMenu}
+                           >
+                              <MenuItem>
+                                 <Link to="/my">
+                                    <Typography sx={{ textAlign: 'center' }}>나의 정보</Typography>
+                                 </Link>
+                              </MenuItem>
+                              <MenuItem>
+                                 <Link to="/my/items">
+                                    <Typography sx={{ textAlign: 'center' }}>나의 상품</Typography>
+                                 </Link>
+                              </MenuItem>
+                              <MenuItem>
+                                 <Typography sx={{ textAlign: 'center' }}>렌탈 내역</Typography>
+                              </MenuItem>
+                              <MenuItem>
+                                 <Typography sx={{ textAlign: 'center' }}>거래 내역</Typography>
+                              </MenuItem>
+                              <MenuItem>
+                                 <Typography sx={{ textAlign: 'center' }}>1:1 채팅</Typography>
+                              </MenuItem>
+                              <MenuItem onClick={handleLogout}>
+                                 <Typography sx={{ textAlign: 'center' }}>로그아웃</Typography>
+                              </MenuItem>
+                           </Menu>
+                        </Box>
+                     ) : (
+                        <Link to="/login">
+                           <img src="/images/로그아웃상태.png" alt="로그인하세요" height="50" />
+                           <span>로그인</span>
+                        </Link>
+                     )}
+                  </li>
+               </ul>
+            </nav>
+         </div>
+      </header>
    )
 }
 

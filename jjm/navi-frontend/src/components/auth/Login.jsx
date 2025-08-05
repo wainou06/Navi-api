@@ -162,22 +162,18 @@ function Login() {
             계정이 없으신가요? <Link to="/signup">회원가입 하기</Link>
          </p>
          <p style={{ textAlign: 'center' }}>다른 계정으로 로그인</p>
-         {/* <Button variant="contained" color="primary" type="submit" fullWidth disabled={loading} sx={{ position: 'relative', marginTop: '20px' }}>
-            {loading ? (
-               <CircularProgress
-                  size={24}
-                  sx={{
-                     position: 'absolute',
-                     top: '50%',
-                     left: '50%',
-                     transform: 'translate(-50%, -50%)',
-                  }}
-               />
-            ) : (
-               '구글 아이디로 로그인'
-            )}
-         </Button> */}
-         <button onClick={() => (window.location.href = 'http://localhost:8000/auth/google/callback')}>구글로 로그인</button>
+         <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ position: 'relative', marginTop: '20px' }}
+            onClick={() => {
+               // window.location.href = 'http://localhost:8000/auth/google/callback'
+               window.location.href = 'http://localhost:8000/auth/google'
+            }}
+         >
+            구글 아이디로 로그인
+         </Button>
       </Container>
    )
 }

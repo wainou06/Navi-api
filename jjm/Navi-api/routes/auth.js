@@ -228,14 +228,43 @@ router.get('/status', async (req, res, next) => {
    }
 })
 
-// router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
+/**
+ * @swagger
+ * /auth/google:
+ *   get:
+ *     summary: 구글 로그인 시작
+ *     description: Google OAuth 인증을 시작합니다.
+ *     tags:
+ *       - Auth
+ *     responses:
+ *       302:
+ *         description: Google OAuth 인증 페이지로 리디렉션
+ */
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
 
-// router.get(
-//    '/google/callback',
-//    passport.authenticate('google', {
-//       failureRedirect: '/login',
-//       successRedirect: '/', // 로그인 성공 후
-//    })
-// )
+/**
+ * @swagger
+ * /auth/google/callback:
+ *   get:
+ *     summary: 구글 로그인 콜백
+ *     description: Google 로그인 성공/실패 후 호출되는 콜백 URL입니다.
+ *     tags:
+ *       - Auth
+ *     responses:
+ *       302:
+ *         description: 로그인 성공 시 프론트엔드로 리디렉션
+ */
+router.get(
+   '/google/callback',
+   passport.authenticate('google', {
+      failureRedirect: 'http://localhost:5173/login',
+      // session: false,
+      session: true,
+   }),
+   (req, res) => {
+      // 로그인 성공 시 프론트로 리디렉션
+      res.redirect('http://localhost:5173')
+   }
+)
 
 module.exports = router

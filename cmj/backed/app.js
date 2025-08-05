@@ -9,9 +9,13 @@ require('dotenv').config()
 
 const indexRouter = require('./routes')
 const keywordRouter = require('./routes/keyword')
+const matchingRouter = require('./routes/matching')
+const authRouter = require('./routes/auth')
 const { sequelize } = require('./models')
+const passportConfig = require('./passport')
 
 const app = express()
+passportConfig()
 app.set('port', process.env.PORT || 8002)
 
 sequelize
@@ -51,6 +55,8 @@ app.use(passport.session())
 
 app.use('/', indexRouter)
 app.use('/keyword', keywordRouter)
+app.use('/matching', matchingRouter)
+app.use('/auth', authRouter)
 
 app.use((req, res, next) => {
    const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`)

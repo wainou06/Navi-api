@@ -1,52 +1,93 @@
 const express = require('express')
-const { Item, Img, Keyword, ItemKeyword, sequelize } = require('../models')
+const multer = require('multer')
+const path = require('path')
+const { Item, Img, ItemKeyword, Keyword, Order, User } = require('../models')
 const { Op } = require('sequelize')
+
 const router = express.Router()
 
-// GET /api/items - 상품 목록 조회
-router.get('/', async (req, res) => {
+// multer 설정 (이미지 업로드)
+const storage = multer.diskStorage({
+   destination: (req, file, cb) => {
+      cb(null, 'uploads/') // uploads 폴더에 저장
+   },
+   filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
+      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname))
+   },
+})
+
+const upload = multer({
+   storage: storage,
+   limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB 제한
+   },
+   fileFilter: (req, file, cb) => {
+      if (file.mimetype.startsWith('image/')) {
+         cb(null, true)
+      } else {
+         cb(new Error('이미지 파일만 업로드 가능합니다.'), false)
+      }
+   },
+})
+
+// GET /items/list - 상품 목록 조회 (검색, 페이징 기능)
+router.get('/list', async (req, res) => {
    try {
-      const { page = 1, limit = 10, status, keyword } = req.query
+      const { page = 1, limit = 12, searchTerm = '', searchCategory = '', sellCategory = '' } = req.query
+
       const offset = (page - 1) * limit
 
-      // 검색 조건
-      const whereClause = {}
-      if (status) {
-         whereClause.status = status
-      }
-      if (keyword) {
-         whereClause[Op.or] = [{ name: { [Op.like]: `%${keyword}%` } }, { content: { [Op.like]: `%${keyword}%` } }]
+      // 검색 조건 설정
+      let whereClause = {}
+
+      if (searchTerm) {
+         whereClause.itemNm = {
+            [Op.like]: `%${searchTerm}%`,
+         }
       }
 
-      const items = await Item.findAndCountAll({
+      if (sellCategory && sellCategory !== '') {
+         whereClause.itemSellStatus = sellCategory
+      }
+
+      // 상품 목록 조회
+      const { count, rows } = await Item.findAndCountAll({
          where: whereClause,
          include: [
             {
                model: Img,
-               as: 'images',
-               attributes: ['id', 'url', 'alt'],
+               as: 'imgs',
+               required: false,
             },
             {
-               model: Keyword,
-               as: 'keywords',
-               through: { attributes: [] },
-               attributes: ['id', 'name'],
+               model: ItemKeyword,
+               required: false,
+               include: [
+                  {
+                     model: Keyword,
+                     required: false,
+                  },
+               ],
             },
          ],
          limit: parseInt(limit),
-         offset: offset,
+         offset: parseInt(offset),
          order: [['createdAt', 'DESC']],
+         distinct: true,
       })
 
-      res.json({
+      const totalPages = Math.ceil(count / limit)
+
+      res.status(200).json({
          success: true,
          data: {
-            items: items.rows,
+            items: rows,
             pagination: {
-               total: items.count,
-               page: parseInt(page),
+               totalItems: count,
+               totalPages,
+               currentPage: parseInt(page),
                limit: parseInt(limit),
-               totalPages: Math.ceil(items.count / limit),
             },
          },
       })
@@ -54,14 +95,14 @@ router.get('/', async (req, res) => {
       console.error('상품 목록 조회 오류:', error)
       res.status(500).json({
          success: false,
-         message: '상품 목록을 가져오는데 실패했습니다.',
+         message: '상품 목록을 불러오는데 실패했습니다.',
          error: error.message,
       })
    }
 })
 
-// GET /api/items/:id - 상품 상세 조회
-router.get('/:id', async (req, res) => {
+// GET /items/detail/:id - 상품 상세 조회
+router.get('/detail/:id', async (req, res) => {
    try {
       const { id } = req.params
 
@@ -69,14 +110,31 @@ router.get('/:id', async (req, res) => {
          include: [
             {
                model: Img,
-               as: 'images',
-               attributes: ['id', 'url', 'alt'],
+               as: 'imgs',
+               required: false,
             },
             {
-               model: Keyword,
-               as: 'keywords',
-               through: { attributes: [] },
-               attributes: ['id', 'name'],
+               model: ItemKeyword,
+               required: false,
+               include: [
+                  {
+                     model: Keyword,
+                     required: false,
+                  },
+               ],
+            },
+            {
+               model: Order,
+               as: 'order',
+               required: false,
+               include: [
+                  {
+                     model: User,
+                     as: 'user',
+                     required: false,
+                     attributes: ['id', 'name', 'email'], // 민감한 정보 제외
+                  },
+               ],
             },
          ],
       })
@@ -88,7 +146,7 @@ router.get('/:id', async (req, res) => {
          })
       }
 
-      res.json({
+      res.status(200).json({
          success: true,
          data: item,
       })
@@ -96,96 +154,96 @@ router.get('/:id', async (req, res) => {
       console.error('상품 상세 조회 오류:', error)
       res.status(500).json({
          success: false,
-         message: '상품 정보를 가져오는데 실패했습니다.',
+         message: '상품을 불러오는데 실패했습니다.',
          error: error.message,
       })
    }
 })
 
-// POST /api/items - 상품 등록
-router.post('/', async (req, res) => {
-   const transaction = await sequelize.transaction()
-
+// POST /items - 상품 등록
+router.post('/', upload.array('img', 5), async (req, res) => {
    try {
-      const {
-         name,
-         price,
-         stock,
-         content,
-         status = 'available', // 기본값: 판매중
-         images = [],
-         keywords = [],
-      } = req.body
+      const { name, price, stock, content, status, keywords } = req.body
 
       // 필수 필드 검증
-      if (!name || !price || stock === undefined) {
+      if (!name || !price || !content) {
          return res.status(400).json({
             success: false,
-            message: '상품명, 가격, 재고는 필수 입력 항목입니다.',
+            message: '상품명, 가격, 상품내용은 필수 항목입니다.',
          })
       }
 
-      // 상품 생성
-      const item = await Item.create(
-         {
-            name,
-            price,
-            stock,
-            content,
-            status,
-         },
-         { transaction }
-      )
-
-      // 이미지 등록
-      if (images.length > 0) {
-         const imageData = images.map((img) => ({
-            url: img.url,
-            alt: img.alt || name,
-            itemId: item.id,
-         }))
-         await Img.bulkCreate(imageData, { transaction })
+      // 상태값 매핑 (프론트엔드 값을 DB ENUM 값으로 변환)
+      const statusMapping = {
+         available: 'SELL',
+         sold: 'SOLD_OUT',
+         on_sale: 'ON_SALE',
       }
 
-      // 키워드 등록
-      if (keywords.length > 0) {
-         for (const keywordName of keywords) {
-            // 키워드가 존재하지 않으면 생성
-            const [keyword] = await Keyword.findOrCreate(
-               {
-                  where: { name: keywordName },
-                  defaults: { name: keywordName },
-               },
-               { transaction }
-            )
+      const mappedStatus = statusMapping[status] || status || 'SELL'
 
-            // 상품-키워드 연결
-            await ItemKeyword.create(
-               {
-                  itemId: item.id,
-                  keywordId: keyword.id,
-               },
-               { transaction }
-            )
+      // 상품 생성
+      const newItem = await Item.create({
+         itemNm: name,
+         price: parseInt(price),
+         itemSellStatus: mappedStatus,
+         itemDetail: content,
+      })
+
+      // 이미지 저장
+      if (req.files && req.files.length > 0) {
+         const imagePromises = req.files.map((file, index) => {
+            return Img.create({
+               originName: file.originalname,
+               imgUrl: file.path,
+               field: index === 0 ? 'Y' : 'N', // 첫 번째 이미지를 대표 이미지로 설정
+               itemId: newItem.id,
+            })
+         })
+         await Promise.all(imagePromises)
+      }
+
+      // 키워드 저장 (키워드가 있는 경우)
+      if (keywords) {
+         const keywordArray = keywords
+            .split(',')
+            .map((k) => k.trim())
+            .filter((k) => k)
+
+         for (const keywordName of keywordArray) {
+            // 키워드가 이미 존재하는지 확인, 없으면 생성
+            const [keyword] = await Keyword.findOrCreate({
+               where: { name: keywordName },
+               defaults: { name: keywordName },
+            })
+
+            // ItemKeyword 관계 생성
+            await ItemKeyword.create({
+               itemId: newItem.id,
+               keywordId: keyword.id,
+               startAt: new Date(),
+               endAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1년 후
+            })
          }
       }
 
-      // 트랜잭션 커밋
-      await transaction.commit()
-
-      // 생성된 상품 정보 조회 (연관 데이터 포함)
-      const createdItem = await Item.findByPk(item.id, {
+      // 생성된 상품 정보를 다시 조회 (관련 데이터 포함)
+      const createdItem = await Item.findByPk(newItem.id, {
          include: [
             {
                model: Img,
-               as: 'images',
-               attributes: ['id', 'url', 'alt'],
+               as: 'imgs',
+               required: false,
             },
             {
-               model: Keyword,
-               as: 'keywords',
-               through: { attributes: [] },
-               attributes: ['id', 'name'],
+               model: ItemKeyword,
+               required: false,
+               include: [
+                  {
+                     model: Keyword,
+                     required: false,
+                  },
+               ],
             },
          ],
       })
@@ -196,9 +254,6 @@ router.post('/', async (req, res) => {
          data: createdItem,
       })
    } catch (error) {
-      // 트랜잭션 롤백
-      await transaction.rollback()
-
       console.error('상품 등록 오류:', error)
       res.status(500).json({
          success: false,
@@ -208,100 +263,108 @@ router.post('/', async (req, res) => {
    }
 })
 
-// PUT /api/items/:id - 상품 수정
-router.put('/:id', async (req, res) => {
-   const transaction = await sequelize.transaction()
-
+// PUT /items/edit/:id - 상품 수정
+router.put('/edit/:id', upload.array('img', 5), async (req, res) => {
    try {
       const { id } = req.params
-      const { name, price, stock, content, status, images = [], keywords = [] } = req.body
+      const { name, price, stock, content, status, keywords } = req.body
 
       // 상품 존재 확인
-      const item = await Item.findByPk(id, { transaction })
+      const item = await Item.findByPk(id)
       if (!item) {
-         await transaction.rollback()
          return res.status(404).json({
             success: false,
-            message: '수정할 상품을 찾을 수 없습니다.',
+            message: '상품을 찾을 수 없습니다.',
          })
       }
 
       // 상품 정보 업데이트
       const updateData = {}
-      if (name !== undefined) updateData.name = name
-      if (price !== undefined) updateData.price = price
-      if (stock !== undefined) updateData.stock = stock
-      if (content !== undefined) updateData.content = content
-      if (status !== undefined) updateData.status = status
-
-      await item.update(updateData, { transaction })
-
-      // 이미지 업데이트 (기존 이미지 삭제 후 새로 추가)
-      if (images.length >= 0) {
-         await Img.destroy({ where: { itemId: id }, transaction })
-         if (images.length > 0) {
-            const imageData = images.map((img) => ({
-               url: img.url,
-               alt: img.alt || name || item.name,
-               itemId: id,
-            }))
-            await Img.bulkCreate(imageData, { transaction })
+      if (name !== undefined) updateData.itemNm = name
+      if (price !== undefined) updateData.price = parseInt(price)
+      if (status !== undefined) {
+         // 상태값 매핑
+         const statusMapping = {
+            available: 'SELL',
+            sold: 'SOLD_OUT',
+            on_sale: 'ON_SALE',
          }
+         updateData.itemSellStatus = statusMapping[status] || status
+      }
+      if (content !== undefined) updateData.itemDetail = content
+
+      await item.update(updateData)
+
+      // 새로운 이미지가 있는 경우 추가
+      if (req.files && req.files.length > 0) {
+         const imagePromises = req.files.map((file, index) => {
+            return Img.create({
+               originName: file.originalname,
+               imgUrl: file.path,
+               field: 'N', // 새로 추가되는 이미지는 대표이미지가 아님
+               itemId: item.id,
+            })
+         })
+         await Promise.all(imagePromises)
       }
 
-      // 키워드 업데이트 (기존 연결 삭제 후 새로 추가)
-      if (keywords.length >= 0) {
-         await ItemKeyword.destroy({ where: { itemId: id }, transaction })
-         if (keywords.length > 0) {
-            for (const keywordName of keywords) {
-               const [keyword] = await Keyword.findOrCreate(
-                  {
-                     where: { name: keywordName },
-                     defaults: { name: keywordName },
-                  },
-                  { transaction }
-               )
+      // 키워드 업데이트
+      if (keywords !== undefined) {
+         // 기존 키워드 관계 삭제
+         await ItemKeyword.destroy({
+            where: { itemId: item.id },
+         })
 
-               await ItemKeyword.create(
-                  {
-                     itemId: id,
-                     keywordId: keyword.id,
-                  },
-                  { transaction }
-               )
+         // 새로운 키워드 추가
+         if (keywords) {
+            const keywordArray = keywords
+               .split(',')
+               .map((k) => k.trim())
+               .filter((k) => k)
+
+            for (const keywordName of keywordArray) {
+               const [keyword] = await Keyword.findOrCreate({
+                  where: { name: keywordName },
+                  defaults: { name: keywordName },
+               })
+
+               await ItemKeyword.create({
+                  itemId: item.id,
+                  keywordId: keyword.id,
+                  startAt: new Date(),
+                  endAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+               })
             }
          }
       }
 
-      // 트랜잭션 커밋
-      await transaction.commit()
-
-      // 업데이트된 상품 정보 조회
+      // 수정된 상품 정보 조회
       const updatedItem = await Item.findByPk(id, {
          include: [
             {
                model: Img,
-               as: 'images',
-               attributes: ['id', 'url', 'alt'],
+               as: 'imgs',
+               required: false,
             },
             {
-               model: Keyword,
-               as: 'keywords',
-               through: { attributes: [] },
-               attributes: ['id', 'name'],
+               model: ItemKeyword,
+               required: false,
+               include: [
+                  {
+                     model: Keyword,
+                     required: false,
+                  },
+               ],
             },
          ],
       })
 
-      res.json({
+      res.status(200).json({
          success: true,
          message: '상품이 성공적으로 수정되었습니다.',
          data: updatedItem,
       })
    } catch (error) {
-      // 트랜잭션 롤백
-      await transaction.rollback()
-
       console.error('상품 수정 오류:', error)
       res.status(500).json({
          success: false,
@@ -311,41 +374,38 @@ router.put('/:id', async (req, res) => {
    }
 })
 
-// DELETE /api/items/:id - 상품 삭제
+// DELETE /items/:id - 상품 삭제
 router.delete('/:id', async (req, res) => {
-   const transaction = await sequelize.transaction()
-
    try {
       const { id } = req.params
 
       // 상품 존재 확인
-      const item = await Item.findByPk(id, { transaction })
+      const item = await Item.findByPk(id)
       if (!item) {
-         await transaction.rollback()
          return res.status(404).json({
             success: false,
-            message: '삭제할 상품을 찾을 수 없습니다.',
+            message: '상품을 찾을 수 없습니다.',
          })
       }
 
-      // 연관 데이터 삭제 (CASCADE로 설정되어 있다면 자동 삭제됨)
-      await ItemKeyword.destroy({ where: { itemId: id }, transaction })
-      await Img.destroy({ where: { itemId: id }, transaction })
+      // 관련 데이터들도 함께 삭제 (Cascade 설정으로 자동 삭제됨)
+      // 하지만 명시적으로 삭제할 수도 있습니다.
+      await ItemKeyword.destroy({
+         where: { itemId: id },
+      })
 
-      // 상품 삭제
-      await item.destroy({ transaction })
+      await Img.destroy({
+         where: { itemId: id },
+      })
 
-      // 트랜잭션 커밋
-      await transaction.commit()
+      // 상품 삭제 (paranoid: true로 설정되어 있어 soft delete)
+      await item.destroy()
 
-      res.json({
+      res.status(200).json({
          success: true,
          message: '상품이 성공적으로 삭제되었습니다.',
       })
    } catch (error) {
-      // 트랜잭션 롤백
-      await transaction.rollback()
-
       console.error('상품 삭제 오류:', error)
       res.status(500).json({
          success: false,

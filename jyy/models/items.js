@@ -22,7 +22,7 @@ module.exports = class Item extends Sequelize.Model {
             },
             orderId: {
                type: Sequelize.INTEGER,
-               allowNull: false,
+               allowNull: true,
                references: {
                   model: 'Orders',
                   key: 'id',

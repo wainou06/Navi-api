@@ -6,14 +6,18 @@ const session = require('express-session')
 const passport = require('passport')
 const path = require('path')
 require('dotenv').config()
+const { swaggerUi, swaggerSpec } = require('./swagger')
 
 //라우터 및 기타 모듈 불러오기
 const indexRouter = require('./routes')
 const { sequelize } = require('./models')
 const itemsRouter = require('./routes/items')
 const rentalItemsRouter = require('./routes/rentalItems')
+const authRouter = require('./routes/auth')
+const passportConfig = require('./passport')
 
 const app = express()
+passportConfig()
 const PORT = process.env.PORT || 3000
 
 // 시퀄라이즈를 사용한 DB연결
@@ -34,6 +38,7 @@ app.use(
    })
 )
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 app.use(morgan('dev'))
 app.use(express.static(path.join(__dirname, 'uploads')))
 app.use(express.json())
@@ -58,6 +63,7 @@ app.use(passport.session())
 app.use('/', indexRouter)
 app.use('/items', itemsRouter)
 app.use('/rental-items', rentalItemsRouter)
+app.use('/auth', authRouter)
 
 app.use((req, res, next) => {
    const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`)
@@ -78,6 +84,10 @@ app.use((err, req, res, next) => {
    })
 })
 
-app.listen(app.get('port'), () => {
+app.listen(PORT, () => {
    console.log(`서버가 작동 중 입니다. http://localhost:${PORT}`)
 })
+
+// app.listen(app.get('port'), () => {
+//    console.log(`서버가 작동 중 입니다. http://localhost:${PORT}`)
+// })

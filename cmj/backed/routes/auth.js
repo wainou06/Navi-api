@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const User = require('../models/user')
-const { isNotLoggedIn } = require('./middlewares')
+const { isNotLoggedIn, isLoggedIn } = require('./middlewares')
 const passport = require('passport')
 const bcrypt = require('bcrypt')
 
@@ -78,6 +78,42 @@ router.post('/login', isNotLoggedIn, async (req, res, next) => {
          })
       })
    })(req, res, next)
+})
+
+router.get('/logout', isLoggedIn, async (req, res, next) => {
+   req.logout((logoutError) => {
+      if (logoutError) {
+         logoutError.status = 500
+         logoutError.message = '로그아웃 중 오류 발생'
+         return next(logoutError)
+      }
+
+      res.status(200).json({
+         success: true,
+         message: '로그아웃에 성공했습니다.',
+      })
+   })
+})
+
+router.get('/status', async (req, res, next) => {
+   try {
+      if (req.isAuthenticated()) {
+         res.status(200).json({
+            isAuthenticated: true,
+            user: {
+               id: req.user.id,
+            },
+         })
+      } else {
+         res.status(200).json({
+            isAuthenticated: false,
+         })
+      }
+   } catch (error) {
+      error.status = 500
+      error.message = '로그인 상태확인 중 오류가 발생했습니다.'
+      next(error)
+   }
 })
 
 module.exports = router

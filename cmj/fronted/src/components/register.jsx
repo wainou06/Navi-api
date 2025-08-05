@@ -38,7 +38,7 @@ export const Register = () => {
          ></input>
          <br></br>
          <input type="password" placeholder="password" value={password} onChange={(e) => setPassword(e.target.value)}></input>
-         <br></br>
+         {/* <br></br> */}
          <input onClick={onClick} type="button" value={'sub'} style={{ cursor: 'pointer' }}></input>
       </div>
    )

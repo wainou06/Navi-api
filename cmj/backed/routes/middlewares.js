@@ -22,6 +22,8 @@ exports.isNotLoggedIn = (req, res, next) => {
 
 exports.isManager = (req, res, next) => {
    if (req.isAuthenticated()) {
+      // console.log('검문', req.user.toJSON())
+
       if (req.user && req.user.access === 'MANAGER') {
          next()
       } else {

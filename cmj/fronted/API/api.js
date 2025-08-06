@@ -74,3 +74,28 @@ export const getKeyword = async () => {
       throw error
    }
 }
+
+export const putKeyword = async (id, name) => {
+   try {
+      const config = {
+         headers: {
+            'Content-type': 'application/json',
+         },
+      }
+
+      const response = await api.put(`/keyword/${id}`, { name: name }, config)
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error}`)
+      throw error
+   }
+}
+
+export const deleteKeyword = async (id) => {
+   try {
+      const response = await api.delete(`/keyword/${id}`)
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error}`)
+   }
+}

@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getKeywordThunk, postKeywordThunk } from '../../redux/slice'
+import { deleteKeywordThunk, getKeywordThunk, postKeywordThunk, putKeywordThunk } from '../../redux/slice'
 import { useEffect } from 'react'
 
 export const Keyword = () => {
    const [keyword, setKeyword] = useState('')
-   const [selected, setSelected] = useState(false)
+   const [selected, setSelected] = useState('')
    const dispatch = useDispatch()
    const { keywords, loading } = useSelector((state) => state.slice)
 
@@ -20,35 +20,26 @@ export const Keyword = () => {
       }
       dispatch(postKeywordThunk(keyword))
          .unwrap()
-         .then()
+         .then(() => {
+            dispatch(getKeywordThunk())
+         })
          .catch((error) => {
             alert('키워드 등록 실패: ', error)
          })
       setKeyword('')
    }
 
-   const list = () => {
-      if (keywords.keywords) {
-         let out = []
-         for (let i = 0; i < keywords.keywords.length; i++) {
-            out.push(
-               <option key={keywords.keywords[i].id} value={keywords.keywords[i].name}>
-                  {keywords.keywords[i].name}
-               </option>
-            )
-         }
-         return out
-      }
-   }
-
    const onChangeSelect = (value) => {
-      if (value == '') {
-         setSelected(false)
+      const selectedKeywordName = value
+      const selectedKeyword = keywords?.keywords?.find((item) => item.name === selectedKeywordName)
+
+      if (selectedKeyword) {
+         setSelected(selectedKeyword.id)
+         setKeyword(selectedKeyword.name)
+      } else {
+         setSelected(null)
          setKeyword('')
-         return
       }
-      setSelected(true)
-      setKeyword(value)
    }
 
    const onClickEdit = () => {
@@ -56,9 +47,35 @@ export const Keyword = () => {
          alert('비어있어요')
          return
       }
+      const id = selected
+      const name = keyword
+
+      dispatch(putKeywordThunk({ id, name }))
+         .unwrap()
+         .then(() => {
+            dispatch(getKeywordThunk())
+            setKeyword('')
+            setSelected('')
+         })
+         .catch((error) => {
+            alert('키워드 수정 실패: ', error)
+         })
    }
 
-   const onclickDelete = () => {}
+   const onclickDelete = () => {
+      const id = selected
+
+      dispatch(deleteKeywordThunk(id))
+         .unwrap()
+         .then(() => {
+            dispatch(getKeywordThunk())
+            setKeyword('')
+            setSelected('')
+         })
+         .catch((error) => {
+            alert('키워드 수정 실패: ', error)
+         })
+   }
 
    return (
       <div>
@@ -68,7 +85,11 @@ export const Keyword = () => {
                <br></br>
                <select onChange={(e) => onChangeSelect(e.target.value)}>
                   <option value={''}>키워드 추가하기</option>
-                  {list()}
+                  {keywords?.keywords?.map((keyword) => (
+                     <option key={keyword.id} value={keyword.name}>
+                        {keyword.name}
+                     </option>
+                  ))}
                </select>
                <br></br>
                {selected ? (

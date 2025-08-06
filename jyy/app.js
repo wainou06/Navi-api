@@ -22,7 +22,7 @@ const PORT = process.env.PORT || 3000
 
 // 시퀄라이즈를 사용한 DB연결
 sequelize
-   .sync({ force: false, alter: true })
+   .sync({ force: true, alter: true })
    .then(() => {
       console.log('데이터베이스 연결 성공')
       console.log('생성된 테이블들:', Object.keys(sequelize.models))
@@ -40,7 +40,8 @@ app.use(
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 app.use(morgan('dev'))
-app.use(express.static(path.join(__dirname, 'uploads')))
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser(process.env.COOKIE_SECRET))

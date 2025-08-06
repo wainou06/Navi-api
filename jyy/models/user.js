@@ -68,5 +68,12 @@ module.exports = class User extends Sequelize.Model {
          sourceKey: 'id',
          as: 'ratings',
       })
+
+      // User -> Item (1:N) (유저와 아이템 관계 추가)
+      db.User.hasMany(db.Item, {
+         foreignKey: 'userId', // 아이템에 userId 외래 키 추가
+         sourceKey: 'id',
+         as: 'items',
+      })
    }
 }

@@ -52,10 +52,25 @@ export const checkAuthStatus = async () => {
 
 export const postKeyword = async (name) => {
    try {
-      const response = await api.post('keyword/', name)
+      const config = {
+         headers: {
+            'Content-Type': 'application/json',
+         },
+      }
+      const response = await api.post('/keyword', { name: name }, config)
       return response
    } catch (error) {
       console.error(`API Request 오류: ${error}`)
+      throw error
+   }
+}
+
+export const getKeyword = async () => {
+   try {
+      const response = await api.get('/keyword')
+      return response
+   } catch (error) {
+      console.error(`API Reques 오류: ${error}`)
       throw error
    }
 }

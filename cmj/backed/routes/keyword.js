@@ -13,11 +13,11 @@ router.post('/', isLoggedIn, isManager, async (req, res, next) => {
          return next(error)
       }
 
-      const keyword = await Keyword.findOne({
+      const exKeyword = await Keyword.findOne({
          where: { name: req.body.name },
       })
 
-      if (keyword) {
+      if (exKeyword) {
          const error = new Error('이미 존재하는 키워드 입니다.')
          error.status = 404
          return next(error)
@@ -36,7 +36,7 @@ router.post('/', isLoggedIn, isManager, async (req, res, next) => {
       })
    } catch (error) {
       error.status = 500
-      error.message = '키워드 등록 중 오류가 발생했습니다.'
+      error.message = `키워드 등록 중 오류가 발생했습니다. ${error}`
       next(error)
    }
 })
@@ -77,7 +77,7 @@ router.get('/', isLoggedIn, async (req, res, next) => {
    try {
       const count = await Keyword.count()
       const keywords = await Keyword.findAll({
-         order: [['createdAt', 'DESC']],
+         // order: [['createdAt', 'DESC']],
       })
 
       console.log('keywords: ', keywords)

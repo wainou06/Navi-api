@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, isAction } from '@reduxjs/toolkit'
-import { checkAuthStatus, loginUser, logoutuser, postKeyword, registerUser } from '../API/api'
+import { checkAuthStatus, getKeyword, loginUser, logoutuser, postKeyword, registerUser } from '../API/api'
 
 export const registerUserThunk = createAsyncThunk('slice/registerUser', async (userData, { rejectWithValue }) => {
    try {
@@ -40,7 +40,16 @@ export const checkAuthStatusThunk = createAsyncThunk('auth/checkAuthStatus', asy
 
 export const postKeywordThunk = createAsyncThunk('keyword/postKeyword', async (name, { rejectWithValue }) => {
    try {
-      const response = await postKeyword()
+      const response = await postKeyword(name)
+      return response.data
+   } catch (error) {
+      return rejectWithValue(error.response?.data?.message)
+   }
+})
+
+export const getKeywordThunk = createAsyncThunk('keyword/getKeyword', async (_, { rejectWithValue }) => {
+   try {
+      const response = await getKeyword()
       return response.data
    } catch (error) {
       return rejectWithValue(error.response?.data?.message)
@@ -54,6 +63,7 @@ const slice = createSlice({
       isAuthenticated: false,
       loading: true,
       error: null,
+      keywords: [],
    },
    reducers: {
       clearAuthError: (state) => {
@@ -88,7 +98,7 @@ const slice = createSlice({
             state.user = action.payload
          })
          .addCase(logoutUserThunk.pending, (state, action) => {
-            state.loading = false
+            state.loading = true
             state.error = action.payloads
          })
          .addCase(logoutUserThunk.fulfilled, (state) => {
@@ -115,6 +125,8 @@ const slice = createSlice({
             state.isAuthenticated = false
             state.user = null
          })
+
+      builder
          .addCase(postKeywordThunk.pending, (state) => {
             state.loading = true
             state.error = null
@@ -123,6 +135,18 @@ const slice = createSlice({
             state.loading = false
          })
          .addCase(postKeywordThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
+         })
+         .addCase(getKeywordThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
+         })
+         .addCase(getKeywordThunk.fulfilled, (state, action) => {
+            state.loading = false
+            state.keywords = action.payload
+         })
+         .addCase(getKeywordThunk.rejected, (state, action) => {
             state.loading = false
             state.error = action.payload
          })

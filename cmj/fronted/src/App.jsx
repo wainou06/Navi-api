@@ -1,21 +1,12 @@
-import { useState } from 'react'
+import { Route, Routes } from 'react-router-dom'
 import './App.css'
-import { Register } from './components/register'
-import { Login } from './components/login'
-import { useSelector } from 'react-redux'
+import Index from '../pages'
 function App() {
-   const slice = useSelector((state) => state.slice)
-   console.log(slice)
    return (
       <div>
-         {!slice.isAuthenticated ? (
-            <div>
-               <Register></Register>
-               <Login></Login>
-            </div>
-         ) : (
-            <></>
-         )}
+         <Routes>
+            <Route path="/" element={<Index></Index>}></Route>
+         </Routes>
       </div>
    )
 }

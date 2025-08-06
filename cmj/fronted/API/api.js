@@ -29,3 +29,33 @@ export const loginUser = async (credential) => {
       throw error
    }
 }
+
+export const logoutuser = async () => {
+   try {
+      const response = await api.get('/auth/logout')
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error}`)
+      throw error
+   }
+}
+
+export const checkAuthStatus = async () => {
+   try {
+      const response = await api.get('/auth/status')
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error}`)
+      throw error
+   }
+}
+
+export const postKeyword = async (name) => {
+   try {
+      const response = await api.post('keyword/', name)
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error}`)
+      throw error
+   }
+}

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, isAction } from '@reduxjs/toolkit'
-import { loginUser, registerUser } from '../API/api'
+import { checkAuthStatus, loginUser, logoutuser, postKeyword, registerUser } from '../API/api'
 
 export const registerUserThunk = createAsyncThunk('slice/registerUser', async (userData, { rejectWithValue }) => {
    try {
@@ -22,6 +22,26 @@ export const loginUserThunk = createAsyncThunk('slice/loginUser', async (credent
 
 export const logoutUserThunk = createAsyncThunk('slice/logoutUser', async (_, { rejectWithValue }) => {
    try {
+      const response = await logoutuser()
+      return response.data
+   } catch (error) {
+      return rejectWithValue(error.response?.data?.message)
+   }
+})
+
+export const checkAuthStatusThunk = createAsyncThunk('auth/checkAuthStatus', async (_, { rejectWithValue }) => {
+   try {
+      const response = await checkAuthStatus()
+      return response.data
+   } catch (error) {
+      return rejectWithValue(error.response?.data?.message)
+   }
+})
+
+export const postKeywordThunk = createAsyncThunk('keyword/postKeyword', async (name, { rejectWithValue }) => {
+   try {
+      const response = await postKeyword()
+      return response.data
    } catch (error) {
       return rejectWithValue(error.response?.data?.message)
    }
@@ -59,7 +79,6 @@ const slice = createSlice({
             state.error = null
          })
          .addCase(loginUserThunk.fulfilled, (state, action) => {
-            console.log('검문')
             state.loading = false
             state.user = action.payload
             state.isAuthenticated = true
@@ -67,6 +86,45 @@ const slice = createSlice({
          .addCase(loginUserThunk.rejected, (state, action) => {
             state.loading = false
             state.user = action.payload
+         })
+         .addCase(logoutUserThunk.pending, (state, action) => {
+            state.loading = false
+            state.error = action.payloads
+         })
+         .addCase(logoutUserThunk.fulfilled, (state) => {
+            state.loading = false
+            state.isAuthenticated = false
+            state.user = null
+         })
+         .addCase(logoutUserThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
+         })
+         .addCase(checkAuthStatusThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
+         })
+         .addCase(checkAuthStatusThunk.fulfilled, (state, action) => {
+            state.loading = false
+            state.isAuthenticated = action.payload.isAuthenticated
+            state.user = action.payload.user || null
+         })
+         .addCase(checkAuthStatusThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
+            state.isAuthenticated = false
+            state.user = null
+         })
+         .addCase(postKeywordThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
+         })
+         .addCase(postKeywordThunk.fulfilled, (state) => {
+            state.loading = false
+         })
+         .addCase(postKeywordThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
          })
    },
 })

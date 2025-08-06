@@ -13,27 +13,37 @@ module.exports = class User extends Sequelize.Model {
                type: Sequelize.STRING(50),
                allowNull: false,
             },
+            // password와 같은 이유로 수정
             nick: {
                type: Sequelize.STRING(255),
-               allowNull: false,
+               allowNull: true,
                unique: true,
             },
+            // 구글 연동을 위해 true로 수정
             password: {
                type: Sequelize.STRING(255),
-               allowNull: false,
+               allowNull: true,
             },
+            // password와 같은 이유로 수정
             phone: {
                type: Sequelize.STRING(255),
-               allowNull: false,
+               allowNull: true,
             },
+            // password와 같은 이유로 수정
             address: {
                type: Sequelize.STRING(255),
-               allowNull: false,
+               allowNull: true,
             },
             role: {
-               type: Sequelize.ENUM('ADMIN', 'USER'),
+               type: Sequelize.ENUM('MANAGER', 'USER'),
                allowNull: false,
-               defaultValue: 'USER', // 기본 값은 'USER'로 설정
+               defaultValue: 'USER',
+            },
+            // 구글 아이디 컬럼 추가 (일반 유저를 위한 null 허용)
+            googleId: {
+               type: Sequelize.STRING(255),
+               allowNull: true,
+               unique: true,
             },
          },
          {

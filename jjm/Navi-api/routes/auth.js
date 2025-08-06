@@ -142,6 +142,7 @@ router.post('/login', isNotLoggedIn, async (req, res, next) => {
             user: {
                id: user.id,
                name: user.name,
+               nick: user.nick,
                role: user.role,
             },
          })
@@ -213,6 +214,7 @@ router.get('/status', async (req, res, next) => {
             user: {
                id: req.user.id,
                name: req.user.name,
+               nick: req.user.nick,
                role: req.user.role,
             },
          })

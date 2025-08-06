@@ -129,7 +129,7 @@ function Login() {
                         <button
                            className="close-btn"
                            onClick={() => {
-                              setOpenEmail(false)
+                              setOpenPhone(false)
                               setIsOpen(false)
                            }}
                         >

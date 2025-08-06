@@ -87,6 +87,19 @@ function Signup() {
             회원가입
          </Typography>
 
+         <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ position: 'relative', marginTop: '20px' }}
+            onClick={() => {
+               // window.location.href = 'http://localhost:8000/auth/google/callback'
+               window.location.href = 'http://localhost:8000/auth/google'
+            }}
+         >
+            구글 아이디로 회원가입
+         </Button>
+
          {error && (
             <Typography color="error" align="center">
                {error}

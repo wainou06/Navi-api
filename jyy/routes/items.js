@@ -188,6 +188,7 @@ router.post('/', upload.array('img', 5), async (req, res) => {
          price: parseInt(price),
          itemSellStatus: mappedStatus,
          itemDetail: content,
+         userId: req.user.id,
       })
 
       // 이미지 저장

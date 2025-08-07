@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 import { checkAuthStatusThunk } from '../redux/slice'
 import { Logout } from '../src/components/logout'
 import { Keyword } from '../src/components/keyword'
+import { Item } from '../src/components/item'
 
 const Index = () => {
    const slice = useSelector((state) => state.slice)
@@ -24,6 +25,7 @@ const Index = () => {
             <div>
                <Logout></Logout>
                <Keyword></Keyword>
+               <Item></Item>
             </div>
          )}
       </>

@@ -11,6 +11,8 @@ const indexRouter = require('./routes')
 const keywordRouter = require('./routes/keyword')
 const matchingRouter = require('./routes/matching')
 const authRouter = require('./routes/auth')
+const itemRouter = require('./routes/item')
+
 const { sequelize } = require('./models')
 const passportConfig = require('./passport')
 
@@ -57,6 +59,7 @@ app.use('/', indexRouter)
 app.use('/keyword', keywordRouter)
 app.use('/matching', matchingRouter)
 app.use('/auth', authRouter)
+app.use('/item', itemRouter)
 
 app.use((req, res, next) => {
    const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`)

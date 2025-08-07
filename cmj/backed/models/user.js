@@ -19,20 +19,25 @@ module.exports = class User extends Sequelize.Model {
             },
             password: {
                type: Sequelize.STRING(255),
-               allowNull: false,
+               allowNull: true,
             },
             phone: {
                type: Sequelize.STRING(255),
-               allowNull: false,
+               allowNull: true,
             },
             address: {
                type: Sequelize.STRING(255),
-               allowNull: false,
+               allowNull: true,
             },
             access: {
                type: Sequelize.ENUM('MANAGER', 'USER'),
                allowNull: false,
                defaultValue: 'USER',
+            },
+            googleId: {
+               type: Sequelize.STRING(255),
+               allowNull: true,
+               unique: true,
             },
          },
          {
@@ -47,22 +52,33 @@ module.exports = class User extends Sequelize.Model {
          }
       )
    }
+
    static associate(db) {
-      User.hasMany(db.Order, {
+      // User -> Order (1:N)
+      db.User.hasMany(db.Order, {
          foreignKey: 'userId',
          sourceKey: 'id',
+         as: 'orders',
       })
-      User.hasMany(db.RentalOrder, {
+
+      // User -> RentalOrder (1:N)
+      db.User.hasMany(db.RentalOrder, {
          foreignKey: 'userId',
          sourceKey: 'id',
+         as: 'rentalOrders',
       })
-      User.hasMany(db.Rating, {
-         foreignKey: 'fromUserId',
+
+      db.User.hasMany(db.Rating, {
+         foreignKey: 'userId',
          sourceKey: 'id',
+         as: 'ratings',
       })
-      User.hasMany(db.Rating, {
-         foreignKey: 'toUserId',
+
+      // User -> Item (1:N) (유저와 아이템 관계 추가)
+      db.User.hasMany(db.Item, {
+         foreignKey: 'userId', // 아이템에 userId 외래 키 추가
          sourceKey: 'id',
+         as: 'items',
       })
    }
 }

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, isAction } from '@reduxjs/toolkit'
-import { checkAuthStatus, deleteKeyword, getKeyword, loginUser, logoutuser, postKeyword, putKeyword, registerUser } from '../API/api'
+import { checkAuthStatus, deleteKeyword, getKeyword, loginUser, logoutuser, postItem, postKeyword, putKeyword, registerUser } from '../API/api'
 
 export const registerUserThunk = createAsyncThunk('slice/registerUser', async (userData, { rejectWithValue }) => {
    try {
@@ -71,6 +71,16 @@ export const deleteKeywordThunk = createAsyncThunk('keyword/deleteKeyword', asyn
    try {
       const id = data
       const response = await deleteKeyword(id)
+
+      return response.data
+   } catch (error) {
+      return rejectWithValue(error.response?.data?.message)
+   }
+})
+
+export const postItemThunk = createAsyncThunk('item/postItem', async (data, { rejectWithValue }) => {
+   try {
+      const response = await postItem(data)
 
       return response.data
    } catch (error) {
@@ -191,6 +201,19 @@ const slice = createSlice({
             state.loading = false
          })
          .addCase(deleteKeywordThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
+         })
+
+      builder
+         .addCase(postItemThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
+         })
+         .addCase(postItemThunk.fulfilled, (state, action) => {
+            state.loading = false
+         })
+         .addCase(postItemThunk.rejected, (state, action) => {
             state.loading = false
             state.error = action.payload
          })

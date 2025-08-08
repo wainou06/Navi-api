@@ -100,9 +100,19 @@ export const checkAuthStatus = async () => {
    }
 }
 
-export const postItem = async (data) => {
+export const postItem = async (name, keywords) => {
    try {
-      const response = await api.post('/item', { name: data })
+      const response = await api.post('/item', { name: name, keywords: keywords })
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error}`)
+      throw error
+   }
+}
+
+export const getMatching = async (keyword) => {
+   try {
+      const response = await api.get('/matching', { keyword: keyword })
       return response
    } catch (error) {
       console.error(`API Request 오류: ${error}`)

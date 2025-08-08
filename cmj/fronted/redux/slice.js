@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, isAction } from '@reduxjs/toolkit'
-import { checkAuthStatus, deleteKeyword, getKeyword, loginUser, logoutuser, postItem, postKeyword, putKeyword, registerUser } from '../API/api'
+import { checkAuthStatus, deleteKeyword, getKeyword, getMatching, loginUser, logoutuser, postItem, postKeyword, putKeyword, registerUser } from '../API/api'
 
 export const registerUserThunk = createAsyncThunk('slice/registerUser', async (userData, { rejectWithValue }) => {
    try {
@@ -80,7 +80,18 @@ export const deleteKeywordThunk = createAsyncThunk('keyword/deleteKeyword', asyn
 
 export const postItemThunk = createAsyncThunk('item/postItem', async (data, { rejectWithValue }) => {
    try {
-      const response = await postItem(data)
+      const { name, addKeywords } = data
+      const response = await postItem(name, addKeywords)
+
+      return response.data
+   } catch (error) {
+      return rejectWithValue(error.response?.data?.message)
+   }
+})
+
+export const getMatchingThunk = createAsyncThunk('matching/getMatching', async (data, { rejectWithValue }) => {
+   try {
+      const response = await getMatching(data)
 
       return response.data
    } catch (error) {
@@ -96,6 +107,7 @@ const slice = createSlice({
       loading: true,
       error: null,
       keywords: [],
+      matchingItems: [],
    },
    reducers: {
       clearAuthError: (state) => {
@@ -214,6 +226,20 @@ const slice = createSlice({
             state.loading = false
          })
          .addCase(postItemThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
+         })
+
+      builder
+         .addCase(getMatchingThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
+         })
+         .addCase(getMatchingThunk.fulfilled, (state, action) => {
+            state.loading = false
+            state.matchingItems = action.payload
+         })
+         .addCase(getMatchingThunk.rejected, (state, action) => {
             state.loading = false
             state.error = action.payload
          })

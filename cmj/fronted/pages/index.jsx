@@ -7,6 +7,7 @@ import { checkAuthStatusThunk } from '../redux/slice'
 import { Logout } from '../src/components/logout'
 import { Keyword } from '../src/components/keyword'
 import { Item } from '../src/components/item'
+import { Matching } from '../src/components/matching'
 
 const Index = () => {
    const slice = useSelector((state) => state.slice)
@@ -26,6 +27,7 @@ const Index = () => {
                <Logout></Logout>
                <Keyword></Keyword>
                <Item></Item>
+               <Matching></Matching>
             </div>
          )}
       </>
